@@ -144,7 +144,7 @@ def get_ancestors(
         if go not in ancestors_old:
             url = f"https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/%s/ancestors?relations=is_a%%2Cpart_of%%2Coccurs_in%%2Cregulates"
             print(url)
-            print(f"GO ancestor info downloaded for {go} from {url} left {e}/{number_seq}")
+            print(f"GO ancestor info downloaded for {go} from {url} left {e+1}/{number_seq}")
             tries = 0
             success = False
             while tries < 10 and not success:
