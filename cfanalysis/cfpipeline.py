@@ -9,16 +9,18 @@ from cfanalysis.gbsc_functional_analysis import FunctionalAnalysis
 
 from optparse import OptionParser
 
+
 class CfPipeline:
-    def __init__(self, gbsc_clusters_dir, protein_id_path):
+    def __init__(self, gbsc_clusters_dir, protein_id_path="prot_ids", exclude_iea = "no", aspect = "F", output_dir = "./gbsc_functional_results/", cache_file = "cache.sqlite", alpha = 0.05, log_file = "gbsc_functional_analysis.log"):
+
         self.gbsc_clusters_dir = gbsc_clusters_dir
         self.protein_id_path = protein_id_path
-        self.exclude_IEA = "no"
-        self.aspect = "F"
-        self.output_dir = "./gbsc_functional_results/"
-        self.cache_file = "cache.sqlite"
-        self.alpha = 0.05
-        self.log_file = "gbsc_functional_analysis.log"
+        self.exclude_iea = exclude_iea
+        self.aspect = aspect
+        self.output_dir = output_dir
+        self.cache_file = cache_file
+        self.alpha = alpha
+        self.log_file = log_file
 
         self.protein_ids = ProteinIds()
         self.download_go = DownloadGo()
@@ -30,7 +32,7 @@ class CfPipeline:
         self.protein_ids.run()
 
         self.download_go.params.protein_id_path = self.protein_id_path
-        self.download_go.params.exclude_IEA = self.exclude_IEA
+        self.download_go.params.exclude_IEA = self.exclude_iea
         self.download_go.params.aspect = self.aspect
         self.download_go.params.output_dir = self.output_dir
         self.download_go.params.cache_file = self.cache_file
