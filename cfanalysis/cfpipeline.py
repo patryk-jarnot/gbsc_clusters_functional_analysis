@@ -1,3 +1,8 @@
+"""
+Author: Patryk Jarnot (2026)
+"""
+
+
 from cfanalysis.download_go import DownloadGo
 from cfanalysis.get_protein_ids import ProteinIds
 from cfanalysis.gbsc_functional_analysis import FunctionalAnalysis
@@ -44,7 +49,7 @@ def main(cfpipeline):
 
 def get_options():
     parser = OptionParser(description="desc")
-    parser.add_option("-p", "--protein_id_path", dest="protein_id_path", default=None,
+    parser.add_option("-p", "--protein_id_path", dest="protein_id_path", default="prot_ids",
                       help="List of proteins for annotations", metavar="FASTA")
     parser.add_option("-e", "--exclude-iea", dest="exclude_IEA", default="no",
                       help="Exclude GO terms with IEA? yes/no", metavar="STRING")

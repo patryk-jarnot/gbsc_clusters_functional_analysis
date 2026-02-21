@@ -7,7 +7,7 @@ GO download logic, clusters GO enrichment algorithms and s-measure caluclations 
 
 Author: Aleksandra Gruca (2026)
 Original: Joanna Ziemska-Legiecka (2025)
-Changes: Patryk Jarnot (2026) - fixes and cache implementation
+Changes: Patryk Jarnot (2026)
 """
 
 GO_ANNOTATIONS_FILE = "go_annotations.json"

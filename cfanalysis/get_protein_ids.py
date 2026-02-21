@@ -1,3 +1,7 @@
+"""
+Author: Patryk Jarnot (2026)
+"""
+
 import os
 
 
