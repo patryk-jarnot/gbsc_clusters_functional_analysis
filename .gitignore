@@ -10,3 +10,5 @@ results/
 .vscode/
 .env
 *.log
+.idea/
+cache.sqlite

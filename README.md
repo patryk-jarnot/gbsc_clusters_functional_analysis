@@ -22,32 +22,32 @@ This project contains Python scripts for:
 ```bash
 python 01_download_go.py \
   --input=./input/gbsc_protein_ids.txt \
-  --exclude_IEA=no \
+  --exclude-iea=no \
   --aspect=F \
-  --project_dir=./results/
+  --output-dir=./results/
 ```
 
 **Parameters:**
 - `--input`: Input file with protein IDs (one ID per line)
-- `--exclude_IEA=no`: Whether to exclude IEA (Inferred from Electronic Annotation) annotations (yes/no)
+- `--exclude-iea=no`: Whether to exclude IEA (Inferred from Electronic Annotation) annotations (yes/no)
 - `--aspect=F`: GO aspect (F=molecular function, P=biological process, C=cellular component)
-- `--ouput_dir`: Output directory for results
+- `--ouput-dir`: Output directory for results
 
 ### Step 2: Functional Analysis
 
 ```bash
 python 02_gbsc_functional_analysis.py \
-  --gbsc_clusters=./path/to/clusters/ \
+  --gbsc-clusters=./path/to/clusters/ \
   --alpha=0.05 \
-  --ouput_dir=./results/ \
-  --log_file=gbsc_functional_analysis.log
+  --ouput-dir=./results/ \
+  --log-file=gbsc_functional_analysis.log
 ```
 
 **Parameters:**
-- `--gbsc_clusters` / `-c`: Path to directory with GBSC clusters
+- `--gbsc-clusters` / `-c`: Path to directory with GBSC clusters
 - `--alpha` / `-a`: Threshold of test significance (default: 0.05)
 - `--ouput_dir` / `-o`: Output directory (should match the one from step 1)
-- `--log_file` / `-l`: Log file name (default: gbsc_functional_analysis.log)
+- `--log-file` / `-l`: Log file name (default: gbsc_functional_analysis.log)
 
 ## Project Structure
 
@@ -59,7 +59,7 @@ python 02_gbsc_functional_analysis.py \
 ├── input/
 │   ├── gbsc_protein_ids.txt          # Protein IDs for analysis
 │   └── clusters_acc/                 # Directories with GBSC clusters
-├── src/                              # Python helper scripts  
+├── src/                              # Python helper scripts
 ├── results/                          # Output results directory
 └── README.md
 

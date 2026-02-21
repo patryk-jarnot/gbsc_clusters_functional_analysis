@@ -7,6 +7,7 @@ GO download logic, clusters GO enrichment algorithms and s-measure caluclations 
 
 Author: Aleksandra Gruca (2026)
 Original: Joanna Ziemska-Legiecka (2025)
+Changes: Patryk Jarnot (2026)
 """
 
 GO_ANNOTATIONS_FILE = "go_annotations.json"
@@ -91,13 +92,13 @@ def main(options, args):
     
 def get_options():
     parser = OptionParser(description="desc")
-    parser.add_option("-c", "--gbsc_clusters", dest="gbsc_clusters", default=None,
+    parser.add_option("-c", "--gbsc-clusters", dest="gbsc_clusters", default=None,
                       help="Path to the directory with GBSC clusters", metavar="DIR")
-    parser.add_option("-a", "--alpha", dest="alpha", default=0.05,
+    parser.add_option("-a", "--alpha", dest="alpha", default=0.05, type="float",
                       help="Threshold of test significance", metavar="FLOAT")
-    parser.add_option('-o', '--ouput_dir', default='./gbsc_functional_results/', 
+    parser.add_option('-o', '--ouput-dir', default='./gbsc_functional_results/',
                       help='Output directory. Should be the same as used in 01_download_go.py')
-    parser.add_option('-l', '--log_file', default='gbsc_functional_analysis.log', 
+    parser.add_option('-l', '--log-file', default='gbsc_functional_analysis.log',
                       help='Log file name')
     options, args = parser.parse_args()
     return  options, args
