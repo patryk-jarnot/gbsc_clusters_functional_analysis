@@ -13,13 +13,11 @@ import os
 import sys
 import json
 import logging
-from multiprocessing import Pool
-
 
 from scipy.stats import hypergeom
 from statsmodels.stats.multitest import multipletests
 
-from src.utils import get_proteins
+from cfanalysis.src.utils import get_proteins
 
 
 logger = logging.getLogger(__name__)

@@ -20,7 +20,7 @@ This project contains Python scripts for:
 ### Step 1: Download GO Annotations
 
 ```bash
-python 01_download_go.py \
+python3 cfanalysis/download_go.py \
   --input=./input/gbsc_protein_ids.txt \
   --exclude-iea=no \
   --aspect=F \
@@ -36,7 +36,7 @@ python 01_download_go.py \
 ### Step 2: Functional Analysis
 
 ```bash
-python 02_gbsc_functional_analysis.py \
+python3 cfanalysis/gbsc_functional_analysis.py \
   --gbsc-clusters=./path/to/clusters/ \
   --alpha=0.05 \
   --ouput-dir=./results/ \

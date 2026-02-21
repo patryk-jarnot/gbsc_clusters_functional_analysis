@@ -22,17 +22,16 @@ import typing
 import json
 from pathlib import Path
 from optparse import OptionParser
-from src.utils import http_get
+from cfanalysis.src.utils import http_get
 
-from src.cache import Cache
-cache = Cache()
+from cfanalysis.src.cache import Cache
 
 
-def fill_names(go_ids, save_file="/tmp/tmp_go.csv"):
+def fill_names(go_ids, cache_db: Cache, save_file="/tmp/tmp_go.csv"):
     for e, go_id in enumerate(list(go_ids)):
         URL = f"https://www.ebi.ac.uk/QuickGO/services/ontology/go/search?query=%s"
         print(URL, e, len(go_ids))
-        value = http_get(URL, [go_id], "search", cache_db=cache)
+        value = http_get(URL, [go_id], "search", cache_db=cache_db)
         for result in json.loads(value)["results"]:
             if result["id"] == go_id:
                 go_name = result['name']
@@ -49,7 +48,7 @@ def get_GO(
         #save_go_file: str,
         aspect: str,
         #lack_goes: str,
-        cache_dir: str,
+        cache_db: Cache,
 ) -> (typing.Dict, set):
     aspect_dict = dict(F="molecular_function",
                        P="biological_process",
@@ -70,8 +69,7 @@ def get_GO(
         url = "https://www.ebi.ac.uk/QuickGO/services/annotation/downloadSearch?geneProductId=%s"
         header = dict(Accept='text/tsv')
         print(protein_run)
-        print("dupa")
-        text = http_get(url, [','.join(protein_run)], os.path.join(cache_dir, "geneproductid"), header, cache_db=cache)
+        text = http_get(url, [','.join(protein_run)], "geneproductid", header, cache_db=cache_db)
         logging.info(f"GO info downloaded for {protein_run} from {url} left {e}/{number_seq}")
         print(url, f"seq_no={e}", f"text={text}", f"tries={tries}")
         e += 1
@@ -112,7 +110,7 @@ def get_GO(
     return result, all_go, protein_go_dict
 
 
-def check_aspect(go, all_go, aspect, cache_dir: str):
+def check_aspect(go, all_go, aspect, cache_db: Cache):
     aspect_dict = dict(F="molecular_function",
                        P="biological_process",
                        C="cellular_component")
@@ -123,7 +121,7 @@ def check_aspect(go, all_go, aspect, cache_dir: str):
         return True
     else:
         url = f"https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/%s/"
-        text = http_get(url, [go], os.path.join(cache_dir, "terms"), cache_db=cache)
+        text = http_get(url, [go], "terms", cache_db=cache_db)
         request_json = json.loads(text)
         if request_json.get("results", {}):
             aspect_go = [i for i in request_json["results"] if i["id"] == go][0]["aspect"]
@@ -138,7 +136,7 @@ def get_ancestors(
         ancestors_old: dict,
         all_go: set,
         aspect: str,
-        cache_dir: str,
+        cache_db: Cache,
 ) -> (dict, set):
     ancestors = {}
     number_seq = len(go_list)
@@ -153,14 +151,14 @@ def get_ancestors(
                 try:
                     #request = requests.get(url, timeout=10)
                     print(f"go: {go}")
-                    text = http_get(url, [go.replace(':', '%3A')], os.path.join(cache_dir, "ancestors"), cache_db=cache)
+                    text = http_get(url, [go.replace(':', '%3A')], "ancestors", cache_db=cache_db)
                     if text is not None:
                         request_json = json.loads(text)
                         if request_json.get("results", {}):
                             ancestors[go] = [i.get("ancestors") for i in request_json.get("results", {}) if
                                              i["id"] == go and i.get("ancestors") is not None]
                             ancestors[go] = [i for sublist in ancestors[go] for i in sublist if
-                                             i != go and check_aspect(i, all_go, aspect, cache_dir)]
+                                             i != go and check_aspect(i, all_go, aspect, cache_db)]
 
                             all_go = all_go.union(set(ancestors[go]))
                             #save_go(save_go_file, {go: ancestors[go]}, "a")
@@ -219,14 +217,18 @@ def get_proteins(input_file_path):
     #        if l.startswith(">"):
     #            yield l.split("|")[1]
 
+    proteins = []
+
     with open(input_file_path, "r", encoding="utf-8") as f:
-        proteins = [line.strip() for line in f]
+        for line in f:
+            if line.strip() != "":
+                proteins.append(line.strip())
     return proteins
 
-def get_max_path(child: str, main_GO: str, cache_dir):
+def get_max_path(child: str, main_GO: str, cache_db):
     url_path = f"https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/%s/paths/%s/"
 
-    text = http_get(url_path, [child, main_GO], os.path.join(cache_dir, "paths"), cache_db=cache)
+    text = http_get(url_path, [child, main_GO], "paths", cache_db=cache_db)
     if text is not None:
         max_path_len = 0
         for result_path in json.loads(text)["results"]:
@@ -236,7 +238,7 @@ def get_max_path(child: str, main_GO: str, cache_dir):
         return max_path_len
 
 
-def get_paths(go: iter, path_path: str, aspect: str, cache_dir: str):
+def get_paths(go: iter, path_path: str, aspect: str, cache_db: Cache):
     aspect_dict = dict(F="GO:0003674",
                        molecular_function="GO:0003674",
                        P="GO:0008150",
@@ -245,7 +247,7 @@ def get_paths(go: iter, path_path: str, aspect: str, cache_dir: str):
                        cellular_component="GO:0005575")
     with open(path_path, "w") as f:
         for go_id in go:
-            path_len = get_max_path(go_id, aspect_dict[aspect], cache_dir)
+            path_len = get_max_path(go_id, aspect_dict[aspect], cache_db)
             f.write(f"{go_id}\t{path_len}\n")
 
 def add_ancestors(
@@ -273,7 +275,7 @@ def crate_annotation_file(all_go, ancestors, ouput_annotation_file):
         json.dump(all_go, f, indent=4, ensure_ascii=False)
 
 
-def prepare_folders(input_file, exclude_IEA, ouptput_dir, cache_dir):
+def prepare_folders(input_file, exclude_IEA, ouptput_dir):
 
     #check if input file with proteins exists
     if not os.path.isfile(input_file):
@@ -281,7 +283,6 @@ def prepare_folders(input_file, exclude_IEA, ouptput_dir, cache_dir):
 
     #create output directory    
     os.makedirs(ouptput_dir, exist_ok=True)
-    os.makedirs(cache_dir, exist_ok=True)
 
     #old files removal and creation of new empty files
 
@@ -314,25 +315,25 @@ def prepare_folders(input_file, exclude_IEA, ouptput_dir, cache_dir):
 
     return go_names_file_path, go_annotations_file_path, exclude_IEA
 
-def main(options):
+def main(options, cache_db):
     
-    go_names_file_path, go_annotations_file_path, exclude_IEA = prepare_folders(options.input, options.exclude_IEA, options.output_dir, options.cache_dir)
+    go_names_file_path, go_annotations_file_path, exclude_IEA = prepare_folders(options.protein_id_path, options.exclude_IEA, options.output_dir)
     
-    proteins = get_proteins(options.input)    
+    proteins = get_proteins(options.protein_id_path)
 
     proteins_go, all_go, protein_go_dict = get_GO(protein_list=proteins,
                                  exclude=exclude_IEA,
-                                 aspect=options.aspect, cache_dir=options.cache_dir)
+                                 aspect=options.aspect, cache_db=cache_db)
                                  #lack_goes=lack_go_file_path)
 
     ancestors, all_go = get_ancestors(set([item for sublist in list(proteins_go.values()) for item in sublist]),
                                       ancestors_old={},
                                       all_go=all_go,
                                       aspect=options.aspect,
-                                      cache_dir=options.cache_dir)
+                                      cache_db=cache_db)
 
     #create file with names of GO terms
-    fill_names(all_go, save_file=go_names_file_path)
+    fill_names(all_go, cache_db, save_file=go_names_file_path)
 
     #create file with max paths of GO terms
     #get_paths(all_go, path_path=go_max_path_file_path, aspect=options.aspect)
@@ -343,7 +344,7 @@ def main(options):
 
 def get_options():
     parser = OptionParser(description="desc")
-    parser.add_option("-i", "--input", dest="input", default=None,
+    parser.add_option("-i", "--input", dest="protein_id_path", default=None,
                       help="List of proteins for annotations", metavar="FASTA")
     parser.add_option("-e", "--exclude-iea", dest="exclude_IEA", default="no",
                       help="Exclude GO terms with IEA? yes/no", metavar="STRING")
@@ -351,18 +352,35 @@ def get_options():
                       help="Aspect of GO", metavar="STRING")
     parser.add_option('-o', '--output-dir', dest="output_dir", default='./gbsc_functional_results/',
                       help='Project directory')
-    parser.add_option('-c', '--cache-dir', dest="cache_dir", default='./cache/',
+    parser.add_option('-c', '--cache-file', dest="cache_file", default='cache.sqlite',
                       help='Cache directory for data downloaded')
     options, args = parser.parse_args()
 
     return options, args
 
+class DownloadGo:
+    class Params:
+        def __init__(self):
+            self.protein_id_path = None
+            self.exclude_IEA = "no"
+            self.aspect = "F"
+            self.output_dir = "./gbsc_functional_results/"
+            self.cache_file = "cache.sqlite"
+
+    def __init__(self):
+        self.params = DownloadGo.Params()
+        self.cache = Cache()
+
+    def run(self):
+        main(self.params, self.cache)
+
 
 if __name__ == "__main__":
     # try:
+    cache = Cache()
     try:
         options, args = get_options()
-        main(options)
+        main(options, cache)
     except KeyboardInterrupt:
         print("Shutdown requested...exiting")
         cache.cursor.close()
