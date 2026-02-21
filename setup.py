@@ -10,6 +10,7 @@ setup(
     license="MIT",
     packages=["cfanalysis", "cfanalysis.src"],
     install_requires=[
+        "requests",
         "statsmodels",
         # "sqlite3",
     ],
