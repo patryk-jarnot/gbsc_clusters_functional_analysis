@@ -376,7 +376,6 @@ class DownloadGo:
 
 
 if __name__ == "__main__":
-    # try:
     cache = Cache()
     try:
         options, args = get_options()
@@ -388,5 +387,5 @@ if __name__ == "__main__":
     except Exception as e:
         cache.cursor.close()
         cache.connection.close()
-        print("closed...")
+        raise e
 
