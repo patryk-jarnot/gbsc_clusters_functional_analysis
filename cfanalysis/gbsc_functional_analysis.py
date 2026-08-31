@@ -36,11 +36,11 @@ def check_folders(options):
     gbsc_clusters_path = options.gbsc_clusters
     #check if GSBSC clusters directory path exists
     if not os.path.isdir(gbsc_clusters_path):
-        sys.exit("Path to the directory with GBSC clusters does not exists. Exiting...")
+        sys.exit("Path to the directory with GBSC clusters does not exists. Exiting... Dir path: {gbsc_clusters_path}")
     
     #check if GSBSC clusters directory path is not empty
     if not os.listdir(gbsc_clusters_path):
-        sys.exit("Directory with GBSC clusters is empty. Exiting...")
+        sys.exit(f"Directory with GBSC clusters is empty. Exiting... Dir path: {gbsc_clusters_path}")
 
     #dictuionary file with mapping GO IDs to GO names
     go_names_file_path = os.path.join(output_dir, GO_NAMES_FILE)
