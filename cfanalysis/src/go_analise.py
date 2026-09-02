@@ -71,10 +71,10 @@ def calc_hypergeometric_single_go_test(
     M = len(set(full_set.keys()))  # liczba wszystkich białek
     m = get_number_of_all_proteins_for_go(full_set, go)  # liczba wszystkich białek z badanym GO
     N = len(set(cluster.keys()))  # rozmiar klastra
-    x = get_number_of_all_proteins_for_go(cluster, go)  # liczba białek w klastrze z badanym GO
-    stat = hypergeom.sf(x - 1, M, m, N)
-    logging.info(f"file: {file}, parameters for GO {go}: M={M} m={m} k={N} x={x} stat={stat}")
-    return stat, M, m, N, x
+    k = get_number_of_all_proteins_for_go(cluster, go)  # liczba białek w klastrze z badanym GO
+    stat = hypergeom.sf(k - 1, M, m, N)
+    logging.info(f"file: {file}, parameters for GO {go}: M={M} m={m} N={N} k={k} stat={stat}")
+    return stat, M, m, N, k
 
 
 def get_number_of_all_proteins_for_go(proteins_go: dict, go: str) -> int:
