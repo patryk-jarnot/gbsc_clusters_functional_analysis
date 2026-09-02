@@ -62,9 +62,9 @@ def get_GO(
     begining = len(protein_list)
     protein_go_dict = {}
     while protein_list:
-        protein_run = protein_list[:100]
+        protein_run = protein_list[:1]
         print(protein_run[0])
-        protein_list = protein_list[100:]
+        protein_list = protein_list[1:]
         tries = 0
         url = "https://www.ebi.ac.uk/QuickGO/services/annotation/downloadSearch?geneProductId=%s"
         header = dict(Accept='text/tsv')

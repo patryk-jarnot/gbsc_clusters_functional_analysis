@@ -65,8 +65,10 @@ def http_get(url, params, data_category, headers=None, timeout=10, cache_db=None
     else:
         value = None
     if value is not None:
+        print(f"[CACHE] OK, category {data_category}")
         return value
     else:
+        print(f"[CACHE] MISS, category {data_category}")
         if headers is not None:
             print(url)
             req = requests.get(url % tuple(params), headers=headers, timeout=timeout)
