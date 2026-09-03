@@ -16,4 +16,4 @@ build/
 cfanalysis.egg-info/
 gbsc_functional_results/
 input/prot_ids
-
+prot_ids
